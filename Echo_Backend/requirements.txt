@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+google-generativeai
+pydantic
+pymongo
+python-dotenv
+markdown
+weasyprint
+python-jose[cryptography]
+passlib[bcrypt]

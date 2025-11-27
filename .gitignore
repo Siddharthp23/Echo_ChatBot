@@ -1,0 +1,66 @@
+# -------------------------
+# Global Python ignores
+# -------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.so
+*.egg-info/
+*.dist-info/
+.env
+.venv/
+venv/
+ENV/
+build/
+dist/
+
+# -------------------------
+# FastAPI specific ignores
+# -------------------------
+# Log files
+*.log
+
+# Storage for generated PDFs
+Echo_Backend/storage/*
+!Echo_Backend/storage/.gitkeep
+
+# Local config / secret keys
+Echo_Backend/.env
+secrets.json
+
+# -------------------------
+# Node / Vite.js ignores
+# -------------------------
+node_modules/
+*.npm/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+dist/
+build/
+.cache/
+.vite/
+vite.config.ts.timestamp*
+
+# -------------------------
+# OS / Editor files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+
+# -------------------------
+# Misc
+# -------------------------
+*.swp
+*.tmp
+*.bak
