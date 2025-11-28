@@ -1,0 +1,73 @@
+/* src/styles/index.css */
+
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap');
+
+/* CSS Variables: color palette */
+:root{
+  --neon-cyan: #5FFFE4;
+  --turquoise-blue: #30E0FF;
+  --mint-green: #8AFCD9;
+  --aqua-glow: #4FD4FF;
+  --teal-dark: #0C3440;
+  --cyan-blue-dark: #08242E;
+  --deep-aqua: #145B73;
+  --bg-black: #000000;
+  --bg-dark-blue: #031726;
+  --soft-glow-blue: #0B2433;
+  --text-white: #FFFFFF;
+  --neon-teal: #31E7C5;
+  --light-grey: #C0C4C6;
+
+  --max-width: 1200px;
+}
+
+/* Basic reset */
+* { box-sizing: border-box; margin:0; padding:0; }
+html,body,#root { height:100%; }
+body{
+  font-family: 'Poppins', 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: linear-gradient(180deg, var(--bg-dark-blue) 0%, var(--bg-black) 75%);
+  color: var(--text-white);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.4;
+}
+
+/* Utility containers */
+.container {
+  width: 90%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+
+/* Typography helpers */
+.h1 { font-size: clamp(28px, 4.5vw, 44px); font-weight:700; color:var(--text-white); }
+.h2 { font-size: clamp(20px, 3.2vw, 26px); font-weight:600; color:var(--text-white); }
+.lead { color:var(--light-grey); font-weight:300; font-size:16px; }
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(90deg, var(--turquoise-blue), var(--neon-cyan));
+  color: var(--cyan-blue-dark);
+  border: none;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow: 0 8px 30px rgba(79,212,255,0.12);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 18px 50px rgba(79,212,255,0.18); }
+
+/* Layout helpers */
+.row { display:flex; gap:24px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.col { flex:1; min-width:0; }
+
+/* Footer small text */
+.small { font-size:13px; color:var(--light-grey); }
+
+/* Responsive container tweaks */
+@media (max-width:900px){
+  .container { width:94%; }
+}
