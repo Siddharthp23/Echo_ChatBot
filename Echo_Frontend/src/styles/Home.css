@@ -77,8 +77,8 @@
 }
 .chat-title { display:flex; gap:12px; align-items:center; }
 .echo-small { width:56px; height:56px; object-fit:cover; border-radius:12px; }
-.chat-with { color:var(--light-grey); font-size:13px; }
-.chat-name { color:var(--text-white); font-weight:700; font-size:18px; }
+.chat-with { color:var(--light-grey); font-size:15px; }
+.chat-name { color:var(--text-white); font-weight:700; font-size:22px; }
 
 /* Chat window */
 .chat-window {
@@ -108,7 +108,7 @@
   max-width:68%;
   padding:12px 14px;
   border-radius:12px;
-  font-size:14px;
+  font-size:16px;
   line-height:1.4;
 }
 .message.me .message-bubble {

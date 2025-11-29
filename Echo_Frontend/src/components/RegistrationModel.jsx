@@ -1,12 +1,25 @@
 // src/components/RegistrationModal.jsx
-import React from "react";
+import React, { useState } from "react";
 import "../styles/RegistrationModel.css";
 import echoImg from "../assets/echo_bot1.jpg";
+import axios from "axios";
+
+// Set your backend base URL here (update if different)
+const API_BASE = "http://127.0.0.1:8000";
+const REGISTER_ENDPOINT = `${API_BASE}/api/auth/api/register`; // update if your route differs
 
 const RegistrationModal = ({ open, onClose, onRegister }) => {
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null); // { type: 'success'|'error', text: string }
+
   if (!open) return null;
 
-  const handleSubmit = (e) => {
+  const showToast = (type, text, ms = 2500) => {
+    setToast({ type, text });
+    setTimeout(() => setToast(null), ms);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.target;
     const name = form.name.value.trim();
@@ -16,18 +29,52 @@ const RegistrationModal = ({ open, onClose, onRegister }) => {
 
     // basic validation
     if (!name || !contact || !email || !password) {
-      alert("Please fill in all fields.");
+      showToast("error", "Please fill in all fields.");
       return;
     }
 
     // simple contact number validation (digits only, 7-15 chars)
     if (!/^\d{7,15}$/.test(contact)) {
-      alert("Please enter a valid contact number (digits only).");
+      showToast("error", "Please enter a valid contact number (7-15 digits).");
       return;
     }
 
-    const payload = { name, contact, email, password };
-    if (onRegister) onRegister(payload);
+    setLoading(true);
+    try {
+      const payload = { name, contact, email, password };
+
+      const resp = await axios.post(REGISTER_ENDPOINT, payload, {
+        headers: { "Content-Type": "application/json" },
+        timeout: 15000,
+      });
+
+      // if backend returns status 200/201 and body with userId (as in your example)
+      if (resp.status >= 200 && resp.status < 300) {
+        showToast("success", "Registered successfully");
+
+        // optional parent callback
+        if (typeof onRegister === "function") {
+          try { onRegister(resp.data); } catch (e) { /* ignore parent errors */ }
+        }
+
+        // close modal after a short delay to let user see the toast
+        setTimeout(() => onClose && onClose(), 800);
+      } else {
+        // unexpected success code
+        showToast("error", resp.data?.message || "Registration failed");
+      }
+    } catch (err) {
+      // prefer backend error message if available
+      const msg =
+        err?.response?.data?.detail ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "Registration failed";
+      showToast("error", msg);
+      console.error("Register error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,7 +116,9 @@ const RegistrationModal = ({ open, onClose, onRegister }) => {
                 <input name="password" type="password" placeholder="Create a password" required />
               </label>
 
-              <button type="submit" className="login-btn">Create Account</button>
+              <button type="submit" className="login-btn" disabled={loading}>
+                {loading ? "Creating account..." : "Create Account"}
+              </button>
 
               <div className="login-alt">
                 <span className="small">By creating an account you agree to our Terms.</span>
@@ -78,6 +127,13 @@ const RegistrationModal = ({ open, onClose, onRegister }) => {
           </section>
         </div>
       </div>
+
+      {/* Simple toast UI */}
+      {toast && (
+        <div className={`simple-toast ${toast.type === "success" ? "toast-success" : "toast-error"}`}>
+          {toast.text}
+        </div>
+      )}
     </div>
   );
 };

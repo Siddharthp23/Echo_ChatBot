@@ -1,10 +1,11 @@
 # routes/chat_routes.py
 import os
-from fastapi import APIRouter, Depends, HTTPException
-from models.chat_model import ChatRequest, ChatResponse
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException, Header
+from models.chat_model import ChatRequest, ChatResponse, ChatHistoryOut
 from services.gemini_service import call_gemini, parse_response, create_pdf_from_markdown
 from database.mongo import get_chat_collection
-from services.auth_service import get_current_user
+from services.auth_service import get_current_user, decode_token
 from datetime import datetime
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -38,3 +39,47 @@ def generate_notes(request: ChatRequest, current_user: dict = Depends(get_curren
         answer=markdown_data,
         pdf_url=f"/storage/{pdf_filename}"
     )
+
+
+@router.get("/chat_details", response_model=List[ChatHistoryOut])
+async def chat_details(Authorization: str = Header(None)):
+    """
+    Return chat history (answer + pdf_url + created_at) for the logged-in user.
+    Expects header: Authorization: Bearer <token>
+    """
+    if Authorization is None:
+        raise HTTPException(status_code=401, detail="Authorization header missing")
+
+    if not Authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid token format")
+
+    token = Authorization.split(" ")[1]
+
+    try:
+        payload = decode_token(token)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    if "userId" not in payload:
+        raise HTTPException(status_code=401, detail="Token missing userId")
+
+    user_id = payload["userId"]
+
+    chat_collection = get_chat_collection()
+
+    # Query for user's chat history (most recent first). Adjust query field names if you use different field names.
+    cursor = chat_collection.find({"userId": user_id}).sort("created_at", -1).limit(200)
+    docs =  cursor.to_list(length=200)
+
+    results = []
+    for d in docs:
+        results.append(
+            ChatHistoryOut(
+                query = d.get("query"),
+                answer=d.get("response") or d.get("answer") or "",
+                pdf_url=d.get("pdf") or d.get("pdf_url"),
+                created_at=d.get("created_at") or d.get("timestamp")
+            )
+        )
+
+    return results

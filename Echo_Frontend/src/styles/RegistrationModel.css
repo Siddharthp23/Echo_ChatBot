@@ -187,3 +187,17 @@
   .modal-overlay { animation: none !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
   .modal { animation: none !important; transform: none !important; opacity: 1 !important; }
 }
+
+.simple-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 30px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: white;
+  z-index: 9999;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  font-weight: 600;
+}
+.toast-success { background: #28a745; }
+.toast-error   { background: #dc3545; }

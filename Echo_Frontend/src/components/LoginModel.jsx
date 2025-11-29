@@ -1,23 +1,60 @@
 // src/components/LoginModal.jsx
-import React from "react";
+import React, { useState } from "react";
 import "../styles/LoginModel.css";
 import echoImg from "../assets/echo_bot1.jpg";
+import { useNavigate } from "react-router-dom";
 
-const LoginModal = ({ open, onClose, onLogin }) => {
+const LoginModal = ({ open, onClose }) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
   if (!open) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     const form = e.target;
     const email = form.email.value.trim();
     const password = form.password.value;
-    // basic validation
+
     if (!email || !password) {
       alert("Please enter both email and password.");
+      setLoading(false);
       return;
     }
-    // call parent callback if provided
-    if (onLogin) onLogin({ email, password });
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/auth/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        alert(errData.detail || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+
+      // Save token + userId
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("userId", data.userId);
+
+      setLoading(false);
+      onClose();
+
+      // redirect to home
+      navigate("/home");
+
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Server error. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,20 +86,9 @@ const LoginModal = ({ open, onClose, onLogin }) => {
                 <input name="password" type="password" placeholder="Enter your password" required />
               </label>
 
-              <button type="submit" className="btn-primary login-btn">Login</button>
-
-              <div className="login-alt">
-                <span className="small">Or</span>
-              </div>
-
-              <button type="button" className="btn-social">
-                <svg className="fb-icon" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M22 12a10 10 0 10-11.5 9.9v-7h-2.6v-3h2.6V9.1c0-2.6 1.5-4 3.8-4 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.7-1.6 1.4V12h2.7l-.4 3h-2.3v7A10 10 0 0022 12z"/></svg>
-                Login with Facebook
+              <button type="submit" className="btn-primary login-btn">
+                {loading ? "Logging in..." : "Login"}
               </button>
-
-              <p className="signup">
-                Don't have an account? <button type="button" className="link-btn">Create account</button>
-              </p>
             </form>
           </section>
         </div>
