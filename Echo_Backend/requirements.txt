@@ -2,6 +2,7 @@ fastapi
 uvicorn
 google-generativeai
 pydantic
+motor
 pymongo
 python-dotenv
 markdown
