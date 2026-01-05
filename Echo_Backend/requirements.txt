@@ -2,6 +2,7 @@ fastapi
 uvicorn
 google-generativeai
 pydantic
+pydantic[email]
 motor
 pymongo
 python-dotenv
@@ -9,5 +10,4 @@ markdown
 weasyprint
 python-jose[cryptography]
 passlib[bcrypt]
-pydantic[email]
 argon2-cffi
