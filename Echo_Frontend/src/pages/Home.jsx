@@ -4,8 +4,8 @@ import NavBar from "../components/NavBar";
 import ChatHistory from "../components/ChatHistory";
 import ChatWindow from "../components/ChatWindow";
 import "../styles/Home.css";
-import avatarSrc from "../assets/echo_bot1.jpg"; // add a small avatar image
-import echoAvatar from "../assets/echo_bot1.jpg"; // your robot image used optionally
+import avatarSrc from "../assets/echo_bot1.jpg"; 
+import echoAvatar from "../assets/echo_bot1.jpg"; 
 
 const sampleConversations = [
   { title: "Recommendation for colours", subtitle: "UI / branding tips", time: "2h" },
@@ -37,10 +37,7 @@ const Home = () => {
               </div>
             </div>
 
-            {/* <div className="chat-actions">
-              <button className="icon-btn">⋯</button>
-              <button className="icon-btn">⚙</button>
-            </div> */}
+          
           </div>
 
           <ChatWindow messages={sampleMessages} />

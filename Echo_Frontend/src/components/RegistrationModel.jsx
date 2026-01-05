@@ -4,13 +4,13 @@ import "../styles/RegistrationModel.css";
 import echoImg from "../assets/echo_bot1.jpg";
 import axios from "axios";
 
-// Set your backend base URL here (update if different)
-const API_BASE = "http://127.0.0.1:8000";
-const REGISTER_ENDPOINT = `${API_BASE}/api/auth/api/register`; // update if your route differs
+// ✅ Backend URL from environment variable
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
+const REGISTER_ENDPOINT = `${API_BASE}/api/auth/api/register`;
 
 const RegistrationModal = ({ open, onClose, onRegister }) => {
   const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null); // { type: 'success'|'error', text: string }
+  const [toast, setToast] = useState(null);
 
   if (!open) return null;
 
@@ -21,21 +21,20 @@ const RegistrationModal = ({ open, onClose, onRegister }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const form = e.target;
     const name = form.name.value.trim();
     const contact = form.contact.value.trim();
     const email = form.email.value.trim();
     const password = form.password.value;
 
-    // basic validation
     if (!name || !contact || !email || !password) {
       showToast("error", "Please fill in all fields.");
       return;
     }
 
-    // simple contact number validation (digits only, 7-15 chars)
     if (!/^\d{7,15}$/.test(contact)) {
-      showToast("error", "Please enter a valid contact number (7-15 digits).");
+      showToast("error", "Please enter a valid contact number (7–15 digits).");
       return;
     }
 
@@ -48,28 +47,29 @@ const RegistrationModal = ({ open, onClose, onRegister }) => {
         timeout: 15000,
       });
 
-      // if backend returns status 200/201 and body with userId (as in your example)
       if (resp.status >= 200 && resp.status < 300) {
         showToast("success", "Registered successfully");
 
-        // optional parent callback
         if (typeof onRegister === "function") {
-          try { onRegister(resp.data); } catch (e) { /* ignore parent errors */ }
+          try {
+            onRegister(resp.data);
+          } catch {}
         }
 
-        // close modal after a short delay to let user see the toast
-        setTimeout(() => onClose && onClose(), 800);
+        setTimeout(() => onClose?.(), 800);
       } else {
-        // unexpected success code
-        showToast("error", resp.data?.message || "Registration failed");
+        showToast(
+          "error",
+          resp.data?.message || "Registration failed"
+        );
       }
     } catch (err) {
-      // prefer backend error message if available
       const msg =
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
         err?.message ||
         "Registration failed";
+
       showToast("error", msg);
       console.error("Register error:", err);
     } finally {
@@ -80,57 +80,99 @@ const RegistrationModal = ({ open, onClose, onRegister }) => {
   return (
     <div className="modal-overlay" onMouseDown={onClose}>
       <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button
+          className="modal-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          ✕
+        </button>
 
         <div className="modal-body">
           <aside className="modal-left">
             <img src={echoImg} alt="Echo" className="modal-echo" />
             <div className="modal-left-text">
               <h2>Create your account</h2>
-              <p>Join Echo to get instant AI help, store your chat history and personalize your experience.</p>
+              <p>
+                Join Echo to get instant AI help, store your chat history and
+                personalize your experience.
+              </p>
             </div>
           </aside>
 
           <section className="modal-right">
             <h3 className="login-title">Register</h3>
-            <p className="login-sub">Enter your details to create an account.</p>
+            <p className="login-sub">
+              Enter your details to create an account.
+            </p>
 
             <form className="login-form" onSubmit={handleSubmit}>
               <label className="field">
                 <span className="field-label">Full name</span>
-                <input name="name" type="text" placeholder="John Doe" required />
+                <input
+                  name="name"
+                  type="text"
+                  placeholder="John Doe"
+                  required
+                />
               </label>
 
               <label className="field">
                 <span className="field-label">Contact number</span>
-                <input name="contact" type="tel" placeholder="9876543210" required />
+                <input
+                  name="contact"
+                  type="tel"
+                  placeholder="9876543210"
+                  required
+                />
               </label>
 
               <label className="field">
                 <span className="field-label">Email address</span>
-                <input name="email" type="email" placeholder="you@example.com" required />
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  required
+                />
               </label>
 
               <label className="field">
                 <span className="field-label">Password</span>
-                <input name="password" type="password" placeholder="Create a password" required />
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Create a password"
+                  required
+                />
               </label>
 
-              <button type="submit" className="login-btn" disabled={loading}>
+              <button
+                type="submit"
+                className="login-btn"
+                disabled={loading}
+              >
                 {loading ? "Creating account..." : "Create Account"}
               </button>
 
               <div className="login-alt">
-                <span className="small">By creating an account you agree to our Terms.</span>
+                <span className="small">
+                  By creating an account you agree to our Terms.
+                </span>
               </div>
             </form>
           </section>
         </div>
       </div>
 
-      {/* Simple toast UI */}
       {toast && (
-        <div className={`simple-toast ${toast.type === "success" ? "toast-success" : "toast-error"}`}>
+        <div
+          className={`simple-toast ${
+            toast.type === "success"
+              ? "toast-success"
+              : "toast-error"
+          }`}
+        >
           {toast.text}
         </div>
       )}

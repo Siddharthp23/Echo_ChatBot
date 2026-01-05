@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-// small item component
+const API_BASE = import.meta.env.VITE_BACKEND_URL;
+
 const ConversationItem = ({ title, subtitle, time }) => (
   <div className="conv-item">
     <div className="conv-meta">
@@ -13,15 +14,18 @@ const ConversationItem = ({ title, subtitle, time }) => (
   </div>
 );
 
-const ChatHistory = ({ apiBase = "http://127.0.0.1:8000" }) => {
+const ChatHistory = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const firstNWords = (text = "", n = 5) => {
     if (!text) return "";
-    // strip markdown headings and newlines for preview
-    const cleaned = text.replace(/[#*_>`~\-]{1,}/g, " ").replace(/\s+/g, " ").trim();
-    return cleaned.split(" ").slice(0, n).join(" ") + (cleaned.split(" ").length > n ? "..." : "");
+    const cleaned = text
+      .replace(/[#*_>`~\-]{1,}/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    const words = cleaned.split(" ");
+    return words.slice(0, n).join(" ") + (words.length > n ? "..." : "");
   };
 
   useEffect(() => {
@@ -30,30 +34,34 @@ const ChatHistory = ({ apiBase = "http://127.0.0.1:8000" }) => {
         const token = localStorage.getItem("token");
         if (!token) {
           setItems([]);
+          setLoading(false);
           return;
         }
 
-        const res = await axios.get(`${apiBase}/api/chat/chat/chat_details`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get(
+          `${API_BASE}/api/chat/chat/chat_details`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         const data = res.data || [];
-        // map to UI-friendly entries
+
         const mapped = data.map((d) => {
-          // format time
           let time = "";
           if (d.created_at) {
             try {
               time = new Date(d.created_at).toLocaleString();
-            } catch (e) {
+            } catch {
               time = d.created_at;
             }
           }
+
           return {
             title: d.query || "Untitled",
             subtitle: firstNWords(d.answer || "", 5),
             time,
-            pdf_url: d.pdf_url
+            pdf_url: d.pdf_url,
           };
         });
 
@@ -67,7 +75,7 @@ const ChatHistory = ({ apiBase = "http://127.0.0.1:8000" }) => {
     };
 
     fetchHistory();
-  }, [apiBase]);
+  }, []);
 
   return (
     <div className="chat-history">
@@ -81,7 +89,9 @@ const ChatHistory = ({ apiBase = "http://127.0.0.1:8000" }) => {
         ) : items.length === 0 ? (
           <div>No chats yet</div>
         ) : (
-          items.map((it, idx) => <ConversationItem key={idx} {...it} />)
+          items.map((it, idx) => (
+            <ConversationItem key={idx} {...it} />
+          ))
         )}
       </div>
     </div>

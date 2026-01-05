@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import "../styles/LandingPage.css";
 import echo from "../assets/echo_bot1.jpg"; 
 import LoginModal from "../components/LoginModel";
-import RegistrationModal from "../components/RegistrationModel"; // ← NEW IMPORT
+import RegistrationModal from "../components/RegistrationModel"; 
 
 const Feature = ({ title, desc, icon }) => (
   <div className="feature-card">
@@ -17,12 +17,12 @@ const Feature = ({ title, desc, icon }) => (
 
 const LandingPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false); // ← NEW STATE
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false); 
 
   const openLogin = () => setIsLoginOpen(true);
   const closeLogin = () => setIsLoginOpen(false);
 
-  const openRegister = () => setIsRegisterOpen(true);  // ← NEW FUNCTION
+  const openRegister = () => setIsRegisterOpen(true);  
   const closeRegister = () => setIsRegisterOpen(false);
 
   const handleLogin = (creds) => {
@@ -30,7 +30,7 @@ const LandingPage = () => {
     setIsLoginOpen(false);
   };
 
-  const handleRegister = (data) => {   // ← NEW HANDLER
+  const handleRegister = (data) => {   
     console.log("Registration data:", data);
     setIsRegisterOpen(false);
   };
