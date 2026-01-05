@@ -9,3 +9,4 @@ markdown
 weasyprint
 python-jose[cryptography]
 passlib[bcrypt]
+pydantic[email]
