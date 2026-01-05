@@ -10,3 +10,4 @@ weasyprint
 python-jose[cryptography]
 passlib[bcrypt]
 pydantic[email]
+argon2-cffi
