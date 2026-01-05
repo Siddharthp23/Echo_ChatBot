@@ -14,18 +14,30 @@ def call_gemini(note_prompt: str) -> str:
 
 
 def parse_response(text: str):
+    """
+    Safely parse Gemini response.
+    Never crash if JSON metadata is missing.
+    """
+
+    metadata = {}
+    pdf_filename = None
+
+    # 1️⃣ Try to extract JSON metadata (optional)
     json_match = re.search(r"```json\s*(\{[\s\S]*?\})\s*```", text)
-    if not json_match:
-        raise ValueError("Gemini response missing JSON metadata")
+    if json_match:
+        try:
+            metadata = json.loads(json_match.group(1))
+            pdf_filename = metadata.get("pdf_filename")
+        except Exception:
+            metadata = {}
 
-    metadata = json.loads(json_match.group(1))
-
-    pdf_filename = metadata.get("pdf_filename")
+    # 2️⃣ Fallback: generate filename if missing
     if not pdf_filename:
-        raise ValueError("pdf_filename missing in metadata")
+        safe_name = re.sub(r"[^\w]+", "_", text[:40]).strip("_")
+        pdf_filename = f"{safe_name or 'Echo_Notes'}.pdf"
 
+    # 3️⃣ Remove JSON block from markdown if present
     markdown_content = re.sub(r"```json[\s\S]*?```", "", text).strip()
-    markdown_content = re.sub(r"PDF:\s*.+$", "", markdown_content).strip()
 
     return metadata, markdown_content, pdf_filename
 
